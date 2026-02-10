@@ -7,7 +7,6 @@ use App\Repository\ResponsibleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,7 +23,7 @@ final class ResponsibleController extends AbstractController
         return $this->json($responsibles);
     }
 
-    #[Route('/responsible/{id}', name: 'app_responsible_show')]
+    #[Route('/responsible/{id}', name: 'app_responsible_show', methods: ['GET'])]
     public function show(int $id): JsonResponse
     {
         $responsible = $this->repository->find($id);
@@ -42,6 +41,42 @@ final class ResponsibleController extends AbstractController
        $entityManager->flush();
 
        return $this->json($responsible, 201);
+    }
+
+    #[Route('/responsible/{id}', name: 'app_responsible_update', methods: ['PUT'])]
+    public function update(
+        int $id,
+        #[MapRequestPayload] Responsible $responsible,
+        EntityManagerInterface $entityManager
+    )
+    {
+        $responsibleFound = $this->repository->find($id);
+
+        if(!$responsibleFound) {
+            throw $this->createNotFoundException("Responsible not found");
+        }
+
+        $responsibleFound->setName($responsible->getName());
+        $entityManager->flush();
+
+        return $this->json(["data" => $responsibleFound]);
+    }
+
+    #[Route('/responsible/{id}', name: 'app_responsible_delete', methods: ['DELETE'])]
+    public function delete(
+        int $id,
+        EntityManagerInterface $entityManager
+    ) {
+        $responsibleFound = $this->repository->find($id);
+
+        if(!$responsibleFound) {
+            throw $this->createNotFoundException("Responsible not found");
+        }
+
+        $entityManager->remove($responsibleFound);
+        $entityManager->flush();
+
+        return $this->json(["data" => "Responsible deleted"]);
     }
 
     #[Route('/responsible/{id}/students', name: 'app_responsible_students')]
