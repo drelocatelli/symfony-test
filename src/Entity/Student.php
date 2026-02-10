@@ -55,7 +55,10 @@ class Student implements JsonSerializable
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
-            'responsible' => $this->getResponsible(),
+            'responsible' => $this->getResponsible() ? [
+                'id' => $this->getResponsible()->getId(),
+                'name' => $this->getResponsible()->getName(),
+            ] : null,
         ];
     }
 

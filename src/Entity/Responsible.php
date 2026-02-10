@@ -81,6 +81,12 @@ class Responsible implements JsonSerializable
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
+            'students' => array_map(function($student) {
+                return [
+                    'id' => $student->getId(),
+                    'name' => $student->getName()
+                ];
+            }, $this->getStudents()->toArray())
         ];
     }
 }
