@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Responsible;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ResponsibleService
 {
@@ -12,13 +13,27 @@ class ResponsibleService
     )
     {}
     
-    public function get(int $id = null): Responsible
+    public function get(int $id = null)
     {
+        $repository = $this->entityManager->getRepository(Responsible::class);
+
+        // get all
         if(!$id) {
-            $result = $this->entityManager->getRepository(Responsible::class)->findAll();
-            return $result[0] ?? throw new \Exception('No responsible found');
+            $result = $repository->findAll();
+            if(empty($result)) {
+                throw new NotFoundHttpException('No responsible found');
+            }
+            return $result;
         }
-        return $this->entityManager->find(Responsible::class, $id);
+
+        // find by id
+        $responsible = $repository->find($id);
+        if(!$responsible) {
+            throw new NotFoundHttpException('No responsible found');
+        }
+        
+        return $responsible;
+
     }
     
     public function create(Responsible $responsible): Responsible

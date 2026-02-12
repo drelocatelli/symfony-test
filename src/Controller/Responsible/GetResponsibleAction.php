@@ -21,7 +21,7 @@ final class GetResponsibleAction extends AbstractController
     )
     {
         $data = $this->service->get($id);
-        return $this->json($data, Response::HTTP_CREATED);
+        return $this->json($data, Response::HTTP_OK);
     }
     
 }
